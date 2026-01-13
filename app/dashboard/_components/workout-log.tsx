@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { format } from "date-fns";
 import { CalendarIcon, Dumbbell } from "lucide-react";
@@ -68,42 +69,63 @@ export function WorkoutLog({ workouts, selectedDate }: WorkoutLogProps) {
                 <p className="text-muted-foreground text-center">
                   No workouts logged for {format(selectedDate, "do MMM yyyy")}
                 </p>
-                <Button className="mt-4">Log a Workout</Button>
+                <Button className="mt-4" asChild>
+                  <Link href={`/dashboard/workout/new?date=${format(selectedDate, "yyyy-MM-dd")}`}>
+                    Log a Workout
+                  </Link>
+                </Button>
               </CardContent>
             </Card>
           ) : (
-            workouts.map((workout) =>
-              workout.exercises.map((exercise) => (
-                <Card key={exercise.id}>
+            workouts.map((workout) => (
+              <div key={workout.id} className="space-y-4">
+                <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Dumbbell className="h-5 w-5" />
-                      {exercise.name}
-                    </CardTitle>
-                    <CardDescription>
-                      {exercise.sets.length} sets logged
-                    </CardDescription>
+                    <CardTitle>{workout.name || "Workout"}</CardTitle>
+                    {workout.notes && (
+                      <CardDescription>{workout.notes}</CardDescription>
+                    )}
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-3 gap-2 text-sm font-medium text-muted-foreground mb-2">
-                      <span>Set</span>
-                      <span>Weight (lbs)</span>
-                      <span>Reps</span>
-                    </div>
-                    {exercise.sets.map((set) => (
-                      <div
-                        key={set.setNumber}
-                        className="grid grid-cols-3 gap-2 py-2 border-t"
-                      >
-                        <span>{set.setNumber}</span>
-                        <span>{set.weight ?? "-"}</span>
-                        <span>{set.reps ?? "-"}</span>
-                      </div>
-                    ))}
-                  </CardContent>
+                  {workout.exercises.length === 0 && (
+                    <CardContent>
+                      <p className="text-muted-foreground text-sm">
+                        No exercises added yet
+                      </p>
+                    </CardContent>
+                  )}
                 </Card>
-              ))
-            )
+                {workout.exercises.map((exercise) => (
+                  <Card key={exercise.id}>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Dumbbell className="h-5 w-5" />
+                        {exercise.name}
+                      </CardTitle>
+                      <CardDescription>
+                        {exercise.sets.length} sets logged
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-3 gap-2 text-sm font-medium text-muted-foreground mb-2">
+                        <span>Set</span>
+                        <span>Weight (lbs)</span>
+                        <span>Reps</span>
+                      </div>
+                      {exercise.sets.map((set) => (
+                        <div
+                          key={set.setNumber}
+                          className="grid grid-cols-3 gap-2 py-2 border-t"
+                        >
+                          <span>{set.setNumber}</span>
+                          <span>{set.weight ?? "-"}</span>
+                          <span>{set.reps ?? "-"}</span>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ))
           )}
         </div>
       </div>

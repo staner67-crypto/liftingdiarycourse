@@ -1,14 +1,10 @@
 import { db } from "@/db";
 import { workouts, workoutExercises, exercises, sets } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { auth } from "@clerk/nextjs/server";
+import { getCurrentUser } from "@/lib/auth";
 
 export async function getWorkoutsByDate(date: string) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    throw new Error("Unauthorized");
-  }
+  const user = await getCurrentUser();
 
   const result = await db
     .select({
@@ -21,7 +17,7 @@ export async function getWorkoutsByDate(date: string) {
     .leftJoin(workoutExercises, eq(workoutExercises.workoutId, workouts.id))
     .leftJoin(exercises, eq(exercises.id, workoutExercises.exerciseId))
     .leftJoin(sets, eq(sets.workoutExerciseId, workoutExercises.id))
-    .where(and(eq(workouts.userId, userId), eq(workouts.date, date)))
+    .where(and(eq(workouts.userId, user.id), eq(workouts.date, date)))
     .orderBy(workoutExercises.order, sets.setNumber);
 
   // Transform flat results into nested structure
@@ -89,3 +85,21 @@ export async function getWorkoutsByDate(date: string) {
 export type WorkoutWithExercises = Awaited<
   ReturnType<typeof getWorkoutsByDate>
 >[number];
+
+export async function createWorkout(data: {
+  name?: string;
+  date: string;
+  notes?: string;
+}) {
+  const user = await getCurrentUser();
+
+  const [workout] = await db
+    .insert(workouts)
+    .values({
+      ...data,
+      userId: user.id,
+    })
+    .returning();
+
+  return workout;
+}
