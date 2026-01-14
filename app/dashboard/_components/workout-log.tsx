@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { format } from "date-fns";
-import { CalendarIcon, Dumbbell } from "lucide-react";
+import { CalendarIcon, Dumbbell, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -83,10 +83,20 @@ export function WorkoutLog({ workouts, selectedDate }: WorkoutLogProps) {
               <div key={workout.id} className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>{workout.name || "Workout"}</CardTitle>
-                    {workout.notes && (
-                      <CardDescription>{workout.notes}</CardDescription>
-                    )}
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <CardTitle>{workout.name || "Workout"}</CardTitle>
+                        {workout.notes && (
+                          <CardDescription>{workout.notes}</CardDescription>
+                        )}
+                      </div>
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/dashboard/workout/${workout.id}`}>
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Edit
+                        </Link>
+                      </Button>
+                    </div>
                   </CardHeader>
                   {workout.exercises.length === 0 && (
                     <CardContent>

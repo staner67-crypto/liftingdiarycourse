@@ -30,7 +30,7 @@ type Workout = {
   notes: string | null;
 };
 
-export function WorkoutForm({ workout }: { workout: Workout }) {
+export function WorkoutMetadataForm({ workout }: { workout: Workout }) {
   const router = useRouter();
 
   const [name, setName] = useState(workout.name ?? "");

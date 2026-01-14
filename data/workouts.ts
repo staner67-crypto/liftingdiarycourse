@@ -139,3 +139,71 @@ export async function updateWorkout(
 
   return workout;
 }
+
+// Get a single workout with exercises and sets
+export async function getWorkoutWithExercises(workoutId: number) {
+  const user = await getCurrentUser();
+
+  const result = await db
+    .select({
+      workout: workouts,
+      workoutExercise: workoutExercises,
+      exercise: exercises,
+      set: sets,
+    })
+    .from(workouts)
+    .leftJoin(workoutExercises, eq(workoutExercises.workoutId, workouts.id))
+    .leftJoin(exercises, eq(exercises.id, workoutExercises.exerciseId))
+    .leftJoin(sets, eq(sets.workoutExerciseId, workoutExercises.id))
+    .where(and(eq(workouts.id, workoutId), eq(workouts.userId, user.id)))
+    .orderBy(workoutExercises.order, sets.setNumber);
+
+  if (result.length === 0 || !result[0].workout) {
+    return null;
+  }
+
+  // Transform flat results into nested structure
+  const workoutData = result[0].workout;
+  const exercisesMap = new Map<
+    number,
+    {
+      id: number;
+      name: string;
+      order: number;
+      sets: { id: number; setNumber: number; weight: string | null; reps: number | null }[];
+    }
+  >();
+
+  for (const row of result) {
+    if (row.workoutExercise && row.exercise) {
+      if (!exercisesMap.has(row.workoutExercise.id)) {
+        exercisesMap.set(row.workoutExercise.id, {
+          id: row.workoutExercise.id,
+          name: row.exercise.name,
+          order: row.workoutExercise.order,
+          sets: [],
+        });
+      }
+
+      const exercise = exercisesMap.get(row.workoutExercise.id)!;
+
+      if (row.set) {
+        exercise.sets.push({
+          id: row.set.id,
+          setNumber: row.set.setNumber,
+          weight: row.set.weight,
+          reps: row.set.reps,
+        });
+      }
+    }
+  }
+
+  return {
+    workout: workoutData,
+    exercises: Array.from(exercisesMap.values()),
+  };
+}
+
+export type WorkoutWithExercisesAndSets = Awaited<
+  ReturnType<typeof getWorkoutWithExercises>
+>;
