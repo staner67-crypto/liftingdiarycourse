@@ -103,3 +103,39 @@ export async function createWorkout(data: {
 
   return workout;
 }
+
+export async function getWorkoutById(workoutId: number) {
+  const user = await getCurrentUser();
+
+  const [workout] = await db
+    .select()
+    .from(workouts)
+    .where(
+      and(
+        eq(workouts.id, workoutId),
+        eq(workouts.userId, user.id)
+      )
+    );
+
+  return workout;
+}
+
+export async function updateWorkout(
+  workoutId: number,
+  data: { name?: string | null; date?: string; notes?: string | null }
+) {
+  const user = await getCurrentUser();
+
+  const [workout] = await db
+    .update(workouts)
+    .set(data)
+    .where(
+      and(
+        eq(workouts.id, workoutId),
+        eq(workouts.userId, user.id)
+      )
+    )
+    .returning();
+
+  return workout;
+}

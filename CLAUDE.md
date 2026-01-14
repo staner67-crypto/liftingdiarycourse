@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Documentation Files
 - `docs/ui.md` - UI component and date formatting standards
+- `docs/server-components.md` - Server component patterns and page structure
 - `docs/data-fetching.md` - Data fetching and database query standards (CRITICAL)
 - `docs/data-mutations.md` - Data mutation and server action standards (CRITICAL)
 - `docs/auth.md` - Authentication standards using Clerk
