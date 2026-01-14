@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { format } from "date-fns";
 import { getWorkoutsByDate } from "@/data/workouts";
 import { WorkoutLog } from "./_components/workout-log";
@@ -15,5 +16,9 @@ export default async function DashboardPage({
 
   const workouts = await getWorkoutsByDate(dateString);
 
-  return <WorkoutLog workouts={workouts} selectedDate={selectedDate} />;
+  return (
+    <Suspense>
+      <WorkoutLog workouts={workouts} selectedDate={selectedDate} />
+    </Suspense>
+  );
 }
