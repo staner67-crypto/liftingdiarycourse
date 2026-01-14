@@ -43,22 +43,29 @@ export function WorkoutLog({ workouts, selectedDate }: WorkoutLogProps) {
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Workout Log</h1>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[200px] justify-start">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(selectedDate, "do MMM yyyy")}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={handleDateChange}
-                autoFocus
-              />
-            </PopoverContent>
-          </Popover>
+          <div className="flex items-center gap-2">
+            <Button asChild>
+              <Link href={`/dashboard/workout/new?date=${format(selectedDate, "yyyy-MM-dd")}`}>
+                Log New Workout
+              </Link>
+            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-[200px] justify-start">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {format(selectedDate, "do MMM yyyy")}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={handleDateChange}
+                  autoFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         <div className="grid gap-4">
@@ -69,11 +76,6 @@ export function WorkoutLog({ workouts, selectedDate }: WorkoutLogProps) {
                 <p className="text-muted-foreground text-center">
                   No workouts logged for {format(selectedDate, "do MMM yyyy")}
                 </p>
-                <Button className="mt-4" asChild>
-                  <Link href={`/dashboard/workout/new?date=${format(selectedDate, "yyyy-MM-dd")}`}>
-                    Log a Workout
-                  </Link>
-                </Button>
               </CardContent>
             </Card>
           ) : (
